@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<title>Icosahedral to Equirectangular Converter</title>
+<style>
+.img-radio {
+  float: left;
+  text-align: center;
+  margin: 8px;
+}
+h2 { clear: both; }
+</style>
+
+<h2>1. Select map image</h2>
+<form id=image>
+<input type=file accept="image/*" name=image>
+<br><img id=loaded height=100>
+</form>
+
+<h2>2. Select map type</h2>
+<form id=options>
+<label class=img-radio>
+<input type=radio name=split value=top checked> Top<br>
+<img src="split_top.png">
+</label>
+
+<label class=img-radio>
+<input type=radio name=split value=bottom> Bottom<br>
+<img src="split_bottom.png">
+</label>
+
+<label class=img-radio>
+<input type=radio name=split value=none> None<br>
+<img src="split_none.png">
+</label>
+
+</form>
+
+<h2>3. Results</h2>
+<canvas style='border: 1px dotted red;' width=800 height=400></canvas>
+<script src=ico2equi.js></script>

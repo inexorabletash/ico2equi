@@ -1,27 +1,25 @@
-const SPLIT_TOP = 1,
-      SPLIT_BOTTOM = 2,
-      SPLIT_NONE = 3;
+const $ = document.querySelector.bind(document);
+const $$ = document.querySelectorAll.bind(document);
 
-const img = document.createElement('img');
-document.body.appendChild(img);
-img.style.width = '75%';
+document.forms.image.image.addEventListener('change', e => {
+  const img = $('#loaded');
+  try { URL.revokeObjectURL(img.src); } catch (_) {}
+  if (!e.target.files.length) return;
 
-//const type = SPLIT_BOTTOM;
-//img.src = 'Zhodane.png';
-//img.src = 'Mithril.png';
+  img.addEventListener('load', run, {once: true});
+  img.src = URL.createObjectURL(e.target.files[0]);
+});
 
-const type = SPLIT_TOP;
-//img.src = 'Terra.png';
-img.src = 'Vland.png';
-//img.src = 'Kusyu.png';
-//img.src = 'Kamsii.png';
 
-//const type = SPLIT_NONE;
-//img.src = 'Denuli.png';
+[...$$('input[type=radio]')].forEach(e => {
+  e.addEventListener('change', run);
+});
 
-img.addEventListener('load', e => {
-  function $(s) { return document.querySelector(s); }
+function run() {
   const canvas = $('canvas'), ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
+  const img = $('#loaded');
+  if (img.naturalWidth === 0 || img.naturalHeight === 0)
+    return;
 
   const out = ctx.createImageData(w, h);
   const pixels = out.data;
@@ -40,6 +38,8 @@ img.addEventListener('load', e => {
     pixels[offset + 3] = 255;
   }
 
+  const type = document.forms.options.split.value;
+
   for (let x = 0; x < w; ++x) {
     for (let y = 0; y < h; ++y) {
       let sx, sy;
@@ -48,7 +48,7 @@ img.addEventListener('load', e => {
       const tf = (f - (tri * 1/10)) * 10; // fraction within half-tri (0...1)
       if (y < h * 1/3) {
         const vf = y / (h / 3); // vertical scale (fraction of half-tri) (0...1)
-        if (type === SPLIT_NONE) {
+        if (type === 'none') {
           const src_tris = 11;
           const base = tri / src_tris;
           if (tri % 2)
@@ -58,13 +58,13 @@ img.addEventListener('load', e => {
         } else {
           const src_tris = 10;
           const base = tri / src_tris;
-          if ((type === SPLIT_TOP) == !!(tri % 2))
+          if ((type === 'top') === !!(tri % 2))
             sx = (base + ((1-vf) + tf * vf) / src_tris) * src.width;
           else
             sx = (base + tf * (vf / src_tris)) * src.width;
         }
       } else if (y < h * 2/3) {
-        if (type === SPLIT_NONE) {
+        if (type === 'none') {
           const vf = (y - h / 3) / (h / 3); // vertical scale (fraction of half-tri) (0...1)
           const src_tris = 11;
           const base = ((tri === 0 && tf < vf) ? (src_tris - 1) : tri) / src_tris;
@@ -74,7 +74,7 @@ img.addEventListener('load', e => {
         }
       } else {
         const vf = 1 - (y - h * 2/3) / (h / 3); // vertical scale (fraction of half-tri)
-        if (type === SPLIT_NONE) {
+        if (type === 'none') {
           const src_tris = 11;
           const base = ((tri === 0 ? (src_tris - 1) : tri) ) / src_tris;
           if (tri % 2)
@@ -84,7 +84,7 @@ img.addEventListener('load', e => {
         } else {
           const src_tris = 10;
           const base = tri / src_tris;
-          if ((type === SPLIT_TOP) == !!(tri % 2))
+          if ((type === 'top') === !!(tri % 2))
             sx = (base + tf * (vf / src_tris)) * src.width;
           else
             sx = (base + ((1-vf) + tf * vf) / src_tris) * src.width;
@@ -110,4 +110,4 @@ img.addEventListener('load', e => {
       canvas.width,
       canvas.height - voff * 2);
   }
-});
+}
